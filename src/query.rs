@@ -1,9 +1,20 @@
 use cosmwasm_std::{Addr, Deps, Order, StdResult};
 
 use crate::{
-    msg::{GetListCandidateResponse, GetUserVoteResponse, GetVotingResponse},
-    state::{CANDIDATES, VOTES, VOTINGS},
+    msg::{
+        GetListCandidateResponse, GetListVotingResponse, GetUserVoteResponse, GetVotingResponse,
+    },
+    state::{Voting, CANDIDATES, VOTES, VOTINGS},
 };
+
+pub fn list_votings(deps: Deps) -> StdResult<GetListVotingResponse> {
+    let votings: Vec<Voting> = VOTINGS
+        .range(deps.storage, None, None, Order::Ascending)
+        .map(|item| item.map(|(_, v)| v))
+        .collect::<StdResult<_>>()?;
+
+    Ok(GetListVotingResponse { votings })
+}
 
 pub fn query_voting(deps: Deps, voting_id: u64) -> StdResult<GetVotingResponse> {
     let voting = VOTINGS.load(deps.storage, voting_id)?;

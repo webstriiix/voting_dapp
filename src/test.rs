@@ -38,6 +38,36 @@ mod test {
     }
 
     #[test]
+    fn test_query_list_votings() {
+        let mut deps = mock_dependencies();
+        instantiate_contract(deps.as_mut());
+
+        let creator = mock_info("alice", &[]);
+
+        // Create multiple votings
+        for i in 1..=3 {
+            let _ = execute(
+                deps.as_mut(),
+                mock_env(),
+                creator.clone(),
+                ExecuteMsg::CreateVoting {
+                    title: format!("Voting {}", i),
+                    description: format!("Description {}", i),
+                },
+            )
+            .unwrap();
+        }
+
+        // Query for list of all votings
+        let bin = query(deps.as_ref(), mock_env(), QueryMsg::GetListVoting {}).unwrap();
+
+        let result: crate::msg::GetListVotingResponse = from_json(bin).unwrap();
+        assert_eq!(result.votings.len(), 3);
+        assert_eq!(result.votings[0].title, "Voting 1");
+        assert_eq!(result.votings[1].title, "Voting 2");
+        assert_eq!(result.votings[2].title, "Voting 3");
+    }
+
     #[test]
     fn test_add_candidates() {
         let mut deps = mock_dependencies();

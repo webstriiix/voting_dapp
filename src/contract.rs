@@ -6,7 +6,7 @@ use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Resp
 use crate::error::ContractError;
 use crate::execute::{execute_add_candidate, execute_create_voting, execute_vote};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_candidates, query_vote, query_voting};
+use crate::query::{list_votings, query_candidates, query_vote, query_voting};
 use crate::state::{CANDIDATE_SEQ, VOTING_SEQ};
 
 /*
@@ -39,9 +39,11 @@ pub fn execute(
         ExecuteMsg::CreateVoting { title, description } => {
             execute_create_voting(deps, info, title, description)
         }
-        ExecuteMsg::AddCandidate { voting_id, name, image_addr } => {
-            execute_add_candidate(deps, info, voting_id, name, image_addr)
-        }
+        ExecuteMsg::AddCandidate {
+            voting_id,
+            name,
+            image_addr,
+        } => execute_add_candidate(deps, info, voting_id, name, image_addr),
         ExecuteMsg::Vote {
             voting_id,
             candidate_id,
@@ -52,6 +54,7 @@ pub fn execute(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
+        QueryMsg::GetListVoting {} => to_json_binary(&list_votings(deps)?),
         QueryMsg::GetVoting { voting_id } => to_json_binary(&query_voting(deps, voting_id)?),
         QueryMsg::ListCandidates { voting_id } => {
             to_json_binary(&query_candidates(deps, voting_id)?)
@@ -62,4 +65,3 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
     }
 }
-

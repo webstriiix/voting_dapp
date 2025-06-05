@@ -7,15 +7,27 @@ pub struct InstantiateMsg {}
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    CreateVoting { title: String, description: String },
-    AddCandidate { voting_id: u64, name: String, image_addr: String },
-    Vote { voting_id: u64, candidate_id: u64 },
+    CreateVoting {
+        title: String,
+        description: String,
+    },
+    AddCandidate {
+        voting_id: u64,
+        name: String,
+        image_addr: String,
+    },
+    Vote {
+        voting_id: u64,
+        candidate_id: u64,
+    },
 }
 
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     #[returns(GetVotingResponse)]
+    GetListVoting {},
+    #[returns(GetListVotingResponse)]
     GetVoting { voting_id: u64 },
     #[returns(GetListCandidateResponse)]
     ListCandidates { voting_id: u64 },
@@ -36,11 +48,6 @@ pub struct GetListVotingResponse {
 #[cw_serde]
 pub struct GetListCandidateResponse {
     pub candidates: Vec<Candidate>,
-}
-
-#[cw_serde]
-pub struct GetListResultResponse {
-    pub results: Vec<Candidate>,
 }
 
 #[cw_serde]
